@@ -8,30 +8,49 @@
 #include <iostream>
 #include <string>
 
+// for replay
 bool repeat = false;
-float camera = 8.0;
+float replayDirectionX = 0;
+float replayDirectionY = 0;
+bool round_finished = false;
+bool upReplay = true;
+bool downReplay = true;
+bool leftReplay = true;
+bool rightReplay = true;
+
+
+// camera modes
+float cameraRot = 0;
+bool cameraMode1 = false;
+bool cameraMode2 = false;
+float camera = 35.0;
+
+
+bool stop_game = false;
 
 float rotAng;
 
 //values of ball projectile for translation
 float ballx = 0;
 float bally = 0;
-float ballz = 0;
+float ballz = 25;
 
 //for controlling ball direction before firing
 float directionX = 0;
 float directionY = 0;
-
-
 bool right = false;
 bool left = false;
 bool up = false;
 bool down = false;
 
+
+// for detecting collisions
 bool verticalWallCollisionU = false;
 bool verticalWallCollisionD = false;
 bool sideWallCollisionR = false;
 bool sideWallCollisionL = false;
+
+
 bool throwBall = false;
 
 float angle = 0;  
@@ -39,6 +58,7 @@ int arrowX = 0;
 int arrowY = 0;
 
 bool disableKeyboard = false;
+
 
 int gameRounds = 3;
 
@@ -88,6 +108,7 @@ void key(unsigned char k, int x, int y)
 				//arrowX = 1;
 			}
 		}
+		
 	}
 	
 	glutPostRedisplay();
@@ -96,14 +117,26 @@ void key(unsigned char k, int x, int y)
 void keyUp(unsigned char k, int x, int y)//keyboard up function is called whenever the keyboard key is released				
 										 //for throwing 
 {
+	if (gameRounds != 0) {
+		if (k == 'c') {
+			cameraMode1 = true;
+			cameraMode2 = false;
+		}
+		if (k == 'v') {
+			cameraMode2 = true;
+			cameraMode1 = false;
+		}
 
-	if (k == 'x') {
-		throwBall = true;
-		disableKeyboard = true;
-	}
+		if (k == 'x') {
+			throwBall = true;
+			disableKeyboard = true;
+		}
 
-	if (k == 'r') {
-		repeat = true;
+		if (k == 'r' && round_finished == true) {
+			repeat = true;
+			throwBall = true;
+			round_finished = false;
+		}
 	}
 	glutPostRedisplay();
 }
@@ -132,6 +165,7 @@ void drawWallBottomAndTop(double thickness, double x, double z, int random) {
 	glutSolidCube(1.0);
 	glPopMatrix();
 }
+
 
 void drawWallRightAndLeft(double thickness, double x, double z, int random) {
 
@@ -179,7 +213,7 @@ void drawRoom() {
 	glPushMatrix();
 	glTranslatef(-3, -6, -15);
 	for (int i = 0; i <= 6; i++) {
-		for (int j = 0; j <= 12; j++) {
+		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
 				if (j % 2 == 0) {
@@ -199,7 +233,7 @@ void drawRoom() {
 				}
 
 			}
-			drawWallBottomAndTop(0.0, i, j, color);
+			drawWallBottomAndTop(0.05, i, j, color);
 		}
 	}
 	glPopMatrix();
@@ -212,7 +246,7 @@ void drawRoom() {
 	glPushMatrix();
 	glTranslatef(-3.5, -5.5, -15);
 	for (int i = 0; i <= 6; i++) {
-		for (int j = 0; j <= 12; j++) {
+		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
 				if (j % 2 == 0) {
@@ -232,7 +266,7 @@ void drawRoom() {
 				}
 
 			}
-			drawWallRightAndLeft(0.0, i, j, color);
+			drawWallRightAndLeft(0.05, i, j, color);
 		}
 	}
 	glPopMatrix();
@@ -245,7 +279,7 @@ void drawRoom() {
 	glPushMatrix();
 	glTranslatef(3.5, -5.5, -15);
 	for (int i = 0; i <= 6; i++) {
-		for (int j = 0; j <= 12; j++) {
+		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
 				if (j % 2 == 0) {
@@ -265,7 +299,7 @@ void drawRoom() {
 				}
 
 			}
-			drawWallRightAndLeft(0.0, i, j, color);
+			drawWallRightAndLeft(0.05, i, j, color);
 		}
 	}
 	glPopMatrix();
@@ -277,7 +311,7 @@ void drawRoom() {
 	glPushMatrix();
 	glTranslatef(-3, 1, -15);
 	for (int i = 0; i <= 6; i++) {
-		for (int j = 0; j <= 12; j++) {
+		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
 				if (j % 2 == 0) {
@@ -297,7 +331,7 @@ void drawRoom() {
 				}
 
 			}
-			drawWallBottomAndTop(0.0, i, j, color);
+			drawWallBottomAndTop(0.05, i, j, color);
 		}
 	}
 	glPopMatrix();
@@ -344,47 +378,161 @@ void drawBall() {
 
 }
 
-void Display(void) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0f, 0.0f, camera, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-
-	drawBall();
-	//drawArrow();
-	drawRoom();
-	char result[100];   // array to hold the result.
-
-	if (gameRounds == 3) {
-		displayText(-1, -2.3, 1, 1, 0, 0, "Game Round: 3");
-	}
-	if (gameRounds == 2) {
-		displayText(-1, -2.3, 1, 1, 0, 0, "Game Round: 2");
-	}
-	if (gameRounds == 1) {
-		displayText(-1, -2.3, 1, 1, 0, 0, "Game Round: 1");
-	}
-	if (gameRounds == 0) {
-		displayText(-1, -2.3, 1, 1, 0, 0, "Game Over");
-	}
 
 
+void reset() {
+	ballx = 0;
+	bally = 0;
+	ballz = 25;
 
+	replayDirectionX = directionX;
+	replayDirectionY = directionY;
+	rightReplay = right;
+	leftReplay = left;
+	upReplay = up;
+	downReplay = down;
 
-	glFlush();
+	
+
+	directionX = 0;
+	directionY = 0;
+
+	right = false;
+	left = false;
+	up = false;
+	down = false;
+
+	verticalWallCollisionU = false;
+	verticalWallCollisionD = false;
+	sideWallCollisionR = false;
+	sideWallCollisionL = false;
+	throwBall = false;
+
+	angle = 0;
+	arrowX = 0;
+	arrowY = 0;
+	cameraRot = 0;
+	camera = 35.0;
+	//camera =8.0;
+
+	disableKeyboard = false;
 }
 
 void Anim() {
-	rotAng += 0.08;
+	//rotAng += 0.08;
 
-
+	// replay
 	if (repeat == true) {
+		if (throwBall == true) {
+			camera -= 0.004;
 
+			if (bally <= -2.5) {									// hit bottom wall
+				verticalWallCollisionD = true;
+				verticalWallCollisionU = false;
+			}
+			if (bally >= 3) {										// hit top wall
+				verticalWallCollisionU = true;
+				verticalWallCollisionD = false;
+			}
+
+
+			if (ballx >= 3) {										// hit right wall
+				sideWallCollisionR = true;
+				sideWallCollisionL = false;
+			}
+			if (ballx <= -3) {										// hit left wall
+				sideWallCollisionR = false;
+				sideWallCollisionL = true;
+			}
+
+			if (ballz <= -15.5) {									// stick to the end wall
+				//gameRounds -= 1;
+				ballx = 0;
+				bally = 0;
+				ballz = 25;
+				directionX = 0;
+				directionY = 0;
+
+
+				rightReplay = false;
+				leftReplay = false;
+				upReplay = false;
+				downReplay = false;
+
+				verticalWallCollisionU = false;
+				verticalWallCollisionD = false;
+				sideWallCollisionR = false;
+				sideWallCollisionL = false;
+				throwBall = false;
+
+				angle = 0;
+				arrowX = 0;
+				arrowY = 0;
+				camera =35.0;
+
+				repeat = false;
+				disableKeyboard = false;
+				
+
+			}
+
+
+
+			ballz -= 0.007;
+
+
+			if (upReplay == true) {
+				if (verticalWallCollisionU == true) {
+					bally -= replayDirectionY;
+				}
+				else {
+					bally += replayDirectionY;
+				}
+			}
+			if (downReplay == true) {
+				if (verticalWallCollisionD == true) {
+					bally -= replayDirectionY;
+				}
+				else {
+					bally += replayDirectionY;
+				}
+			}
+
+			if (leftReplay == true) {
+				if (sideWallCollisionL == true) {
+					ballx -= replayDirectionX;
+				}
+				else {
+					ballx += replayDirectionX;
+				}
+			}
+			if (rightReplay == true) {
+				if (sideWallCollisionR == true) {
+					ballx -= replayDirectionX;
+				}
+				else {
+					ballx += replayDirectionX;
+				}
+			}
+
+
+		}
 	}
 
-	
+	// normal gameplay
+	else{
+
 	if (throwBall == true) {
-		//camera -= 0.002;
+
+		//camera mode 1
+		if (cameraMode1 == true) {
+			camera -= 0.004;
+			cameraRot -= 0.002;
+		}
+		//camera mode 2
+		if (cameraMode2 == true) {
+			camera -= 0.004;
+		}
 
 		if (bally <= -2.5) {									// hit bottom wall
 			verticalWallCollisionD = true;
@@ -406,40 +554,19 @@ void Anim() {
 		}
 
 		if (ballz <= -15.5) {									// stick to the end wall
-			gameRounds -= 1;
-			ballx = 0;
-			bally = 0;
-			ballz = 0;
-			directionX = 0;
-			directionY = 0;
-
-
-			right = false;
-			left = false;
-			up = false;
-			down = false;
-
-			verticalWallCollisionU = false;
-			verticalWallCollisionD = false;
-			sideWallCollisionR = false;
-			sideWallCollisionL = false;
-			throwBall = false;
-
-			angle = 0;
-			arrowX = 0;
-			arrowY = 0;
-			//camera =8.0;
-
-			disableKeyboard = false;
 			
+			gameRounds -= 1;
+			reset();
+			round_finished = true;
+
 		}
 
 
 
-		ballz -= 0.003;
-		
+		ballz -= 0.007;
 
-		if (up== true) {
+
+		if (up == true) {
 			if (verticalWallCollisionU == true) {
 				bally -= directionY;
 			}
@@ -448,7 +575,7 @@ void Anim() {
 			}
 		}
 		if (down == true) {
-			if (verticalWallCollisionD== true) {
+			if (verticalWallCollisionD == true) {
 				bally -= directionY;
 			}
 			else {
@@ -472,14 +599,65 @@ void Anim() {
 				ballx += directionX;
 			}
 		}
-		
+
 
 	}
+}
 
 	glutPostRedisplay();
 }
 
 
+void setupLights() {
+	GLfloat ambient[] = { 0.7f, 0.7f, 0.7, 1.0f };
+	GLfloat diffuse[] = { 0.6f, 0.6f, 0.6, 1.0f };
+	GLfloat specular[] = { 1.0f, 1.0f, 1.0, 1.0f };
+	GLfloat shininess[] = { 20 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+	GLfloat lightIntensity[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	GLfloat lightPosition[] = { 0.1f, 0.1f,0.0f, 0.0f };
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
+}
+
+
+void Display(void) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	
+	setupLights();
+
+
+	gluLookAt(0.0f, 0.0f, camera, 0.0f, 1.0f, 0.0f, cameraRot, 1.0f, 0.0f);
+
+	drawBall();
+	//drawArrow();
+	drawRoom();
+	char result[100];   // array to hold the result.
+
+	if (gameRounds == 3) {
+		displayText(-1, -3.4, 25, 1, 0, 0, "Game Round: 3");
+	}
+	if (gameRounds == 2) {
+		displayText(-1, -3.4, 25, 1, 0, 0, "Game Round: 2");
+	}
+	if (gameRounds == 1) {
+		displayText(-1, -3.4, 25, 1, 0, 0, "Game Round: 1");
+	}
+	if (gameRounds == 0) {
+		displayText(-1, -3.4, 25, 1, 0, 0, "Game Over");
+	}
+
+
+
+
+	glFlush();
+}
 
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
@@ -494,6 +672,12 @@ void main(int argc, char** argv) {
 	glutKeyboardUpFunc(keyUp);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
 
 
 	glClearDepth(1.0f);									// Set background depth to farthest
