@@ -19,6 +19,7 @@ bool leftReplay = true;
 bool rightReplay = true;
 
 
+
 // camera modes
 float cameraRot = 0;
 bool cameraMode1 = false;
@@ -43,7 +44,6 @@ bool left = false;
 bool up = false;
 bool down = false;
 
-
 // for detecting collisions
 bool verticalWallCollisionU = false;
 bool verticalWallCollisionD = false;
@@ -63,6 +63,93 @@ bool disableKeyboard = false;
 int gameRounds = 3;
 
 
+//for lighting tiles on touch
+bool upTouchRed = false;
+bool upTouchBlue = false;
+bool upTouchGreen = false;
+bool upTouchOrange = false;
+
+bool rightTouchRed = false;
+bool rightTouchBlue = false;
+bool rightTouchGreen = false;
+bool rightTouchOrange = false;
+
+bool leftTouchRed = false;
+bool leftTouchBlue = false;
+bool leftTouchGreen = false;
+bool leftTouchOrange = false;
+
+bool downTouchRed = false;
+bool downTouchBlue = false;
+bool downTouchGreen = false;
+bool downTouchOrange = false;
+
+
+//score 
+int score = 0;
+
+
+class TileUp {
+public:
+	int score;
+	float xCoordinate;
+	float zCoordinate;
+	
+};
+class TileDown {
+public:
+	int score;
+	float xCoordinate;
+	float zCoordinate;
+
+};
+class TileLeft {
+public:
+	int score;
+	float yCoordinate;
+	float zCoordinate;
+
+};
+class TileRight {
+public:
+	int score;
+	float yCoordinate;
+	float zCoordinate;
+
+};
+
+
+TileUp upTiles[240];
+TileDown downTiles[240];
+TileRight rightTiles[240];
+TileLeft leftTiles[240];
+
+
+void time(int val)
+{
+	upTouchOrange   = false;
+	upTouchGreen    = false;
+	upTouchRed      = false;
+	upTouchBlue     = false;
+
+	rightTouchRed   =false;
+	rightTouchBlue	=false;
+	rightTouchGreen	=false;
+	rightTouchOrange=false;
+
+	leftTouchRed	=false;
+	leftTouchBlue 	=false;
+	leftTouchGreen	=false;
+	leftTouchOrange	=false;
+
+	downTouchRed	=false;
+	downTouchBlue 	=false;
+	downTouchGreen	=false;
+	downTouchOrange	=false;
+
+	glutPostRedisplay();
+
+}
 
 void displayText(float x, float y,float z, int r, int g, int b, const char* string) {
 	int j = strlen(string);
@@ -142,49 +229,67 @@ void keyUp(unsigned char k, int x, int y)//keyboard up function is called whenev
 }
 
 void drawWallBottomAndTop(double thickness, double x, double z, int random) {
-	
 
 	glPushMatrix();
 	if (random == 1) {
-		glColor3f(1.0, 0.3, 0.0);
+		glColor3f(0.7, 0.0, 0.0);
 	}
 	else if(random == 2){
-		glColor3f(0.2, 0.4, 1.0);
+		glColor3f(0.0, 0.0, 0.7);
 	}
 	else if (random == 3){
-		glColor3f(0.5, 0.7, 0.0);
+		glColor3f(1.0, 0.5, 0.0);
 	}
 	else if (random == 4) {
-		glColor3f(1.0, 1.0, 1.0);
+		glColor3f(0.0, 0.5, 0.0);
 	}
-	else {
-		glColor3f(1.0, 1.0, 1.0);
+	else if(random== -1){
+		glColor3f(1.0, 0.0, 0.0);
 	}
+	else if (random == -2) {
+		glColor3f(1.0, 0.0, 1.0);
+	}
+	else if (random == -3) {
+		glColor3f(1.0, 1.0, 0.0);
+	}
+	else if (random == -4) {
+		glColor3f(0.0, 1.0, 0.0);
+	}
+
+
 	glTranslated(x, 0, z);
 	glScaled(1.0, thickness, 1.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 }
 
-
 void drawWallRightAndLeft(double thickness, double x, double z, int random) {
 
 
 	glPushMatrix();
 	if (random == 1) {
-		glColor3f(0.50, 0.2, 0.6);
+		glColor3f(0.0, 0.0, 0.7);
 	}
 	else if (random == 2) {
-		glColor3f(0.3, 0.4, 0.2);
+		glColor3f(0.7, 0.0, 0.0);
 	}
 	else if (random == 3) {
-		glColor3f(0.3, 1.0, 0.2);
+		glColor3f(0.0, 0.5, 0.0);
 	}
 	else if (random == 4) {
-		glColor3f(0.8, 0.4, 0.2);
+		glColor3f(1.0, 0.5, 0.0);
 	}
-	else {
-		glColor3f(1.0, 1.0, 1.0);
+	else if (random == -1) {
+		glColor3f(0.0, 0.0, 1.0);
+	}
+	else if (random == -2) {
+		glColor3f(1.0, 0.0, 1.0);
+	}
+	else if (random == -3) {
+		glColor3f(0.0, 1.0, 0.0);
+	}
+	else if (random == -4) {
+		glColor3f(1.0, 1.0, 0.0);
 	}
 	glRotated(90, 0, 0, 1);
 	glTranslated(x, 0, z);
@@ -196,7 +301,7 @@ void drawWallRightAndLeft(double thickness, double x, double z, int random) {
 void drawWallEnd(double thickness, double x, double z) {
 	glPushMatrix();
 	glRotated(90, 1, 0, 0);
-	glColor3f(0.2, 0.0, 0.7);
+	glColor3f(0.5, 0.5, 0.5);
 	glTranslated(x, 0, z);
 	glScaled(1.0, thickness, 1.0);
 	glutSolidCube(1.0);
@@ -208,32 +313,51 @@ void drawRoom() {
 	glPushMatrix();
 	glTranslatef(0.0, 3.0, 0.0);
 
+	
 
 	// draw the bottom wall tiles
 	glPushMatrix();
 	glTranslatef(-3, -6, -15);
+	int k = 0;
 	for (int i = 0; i <= 6; i++) {
 		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && downTouchRed == true) {
+					color = -1;
+				}
+				else if (j % 2 == 0) {
 					color = 1;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && downTouchBlue==true) {
+					color = -2;
+				}
+				else if (j % 2 != 0) {
 					color = 2;
 				}
 
 			}
 			else {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && downTouchOrange == true) {
+					color = -3;
+				}
+				else if (j % 2 == 0) {
 					color = 3;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && downTouchGreen == true) {
+					color = -4;
+				}
+				else if (j % 2 != 0) {
 					color = 4;
 				}
 
 			}
+			// draws one tile every loop
 			drawWallBottomAndTop(0.05, i, j, color);
+			downTiles[k].score=color;
+			downTiles[k].xCoordinate = -3 + i;
+			downTiles[k].zCoordinate = -15 + j;
+			k++;
 		}
 	}
 	glPopMatrix();
@@ -245,28 +369,46 @@ void drawRoom() {
 	// draw the left wall tiles
 	glPushMatrix();
 	glTranslatef(-3.5, -5.5, -15);
+	int p = 0;
 	for (int i = 0; i <= 6; i++) {
 		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && leftTouchRed == true) {
+					color = -1;
+				}
+				else if (j % 2 == 0) {
 					color = 1;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && leftTouchBlue == true) {
+					color = -2;
+				}
+				else if (j % 2 != 0) {
 					color = 2;
 				}
 
 			}
 			else {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && leftTouchOrange == true) {
+					color = -3;
+				}
+				else if (j % 2 == 0) {
 					color = 3;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && leftTouchGreen == true) {
+					color = -4;
+				}
+				else if (j % 2 != 0) {
 					color = 4;
 				}
 
+
 			}
 			drawWallRightAndLeft(0.05, i, j, color);
+			leftTiles[p].score = color;
+			leftTiles[p].yCoordinate = (-3.5*sin(90))+(-5.5*cos(90))+i;
+			leftTiles[p].zCoordinate = -15 + j;
+			p++;
 		}
 	}
 	glPopMatrix();
@@ -278,27 +420,45 @@ void drawRoom() {
 	// draw the right wall tiles
 	glPushMatrix();
 	glTranslatef(3.5, -5.5, -15);
+	int f = 0;
 	for (int i = 0; i <= 6; i++) {
 		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && rightTouchRed == true) {
+					color = -1;
+				}
+				else if (j % 2 == 0) {
 					color = 1;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && rightTouchBlue == true) {
+					color = -2;
+				}
+				else if (j % 2 != 0) {
 					color = 2;
 				}
 
 			}
 			else {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && rightTouchOrange == true) {
+					color = -3;
+				}
+				else if (j % 2 == 0) {
 					color = 3;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && rightTouchGreen == true) {
+					color = -4;
+				}
+				else if (j % 2 != 0) {
 					color = 4;
 				}
 
+
 			}
+			rightTiles[f].score = color;
+			rightTiles[f].yCoordinate = (-3.5 * sin(90)) + (-5.5 * cos(90)) + i;
+			rightTiles[f].zCoordinate = -15 + j;
+			f++;
 			drawWallRightAndLeft(0.05, i, j, color);
 		}
 	}
@@ -310,28 +470,47 @@ void drawRoom() {
 	// draw the top wall tiles
 	glPushMatrix();
 	glTranslatef(-3, 1, -15);
+	int u = 0;
 	for (int i = 0; i <= 6; i++) {
 		for (int j = 0; j <= 40; j++) {
 			int color = 0;
 			if (i % 2 == 0) {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && upTouchRed == true) {
+					color = -1;
+				}
+				else if (j % 2 == 0) {
 					color = 1;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && upTouchBlue==true) {
+					color = -2;
+				}
+				else if (j % 2 != 0) {
 					color = 2;
 				}
 
 			}
 			else {
-				if (j % 2 == 0) {
+				if (j % 2 == 0 && upTouchOrange==true) {
+					color = -3;
+				}
+				else if (j % 2 == 0) {
 					color = 3;
 				}
-				if (j % 2 != 0) {
+				else if (j % 2 != 0 && upTouchGreen==true) {
+					color = -4;
+				}
+				else if (j % 2 != 0) {
 					color = 4;
 				}
 
+
 			}
+			
+			upTiles[u].score = color;
+			upTiles[u].xCoordinate = -3 + i;
+			upTiles[u].zCoordinate = -15 + j;
 			drawWallBottomAndTop(0.05, i, j, color);
+			u++;
 		}
 	}
 	glPopMatrix();
@@ -372,13 +551,11 @@ void drawArrow() {
 void drawBall() {
 	glPushMatrix();
 	glTranslatef(ballx, bally, ballz);
-	glColor3f(1.0f, 0.0f, 1.0f);
+	glColor3f(1.0f, 0.0f, 0.0f);
 	glutSolidSphere(0.3, 25, 25);
 	glPopMatrix();
 
 }
-
-
 
 void reset() {
 	ballx = 0;
@@ -446,7 +623,6 @@ void Anim() {
 			}
 
 			if (ballz <= -15.5) {									// stick to the end wall
-				//gameRounds -= 1;
 				ballx = 0;
 				bally = 0;
 				ballz = 25;
@@ -537,28 +713,125 @@ void Anim() {
 		if (bally <= -2.5) {									// hit bottom wall
 			verticalWallCollisionD = true;
 			verticalWallCollisionU = false;
+
+			// detecting which tile the ball hit exactly in bottom floor to calculate score
+			for (int i = 0; i < sizeof(downTiles)/ sizeof(downTiles[0]); i++) {
+				if (ballx<= downTiles[i].xCoordinate+0.5 && ballx >= downTiles[i].xCoordinate - 0.5 && ballz <= downTiles[i].zCoordinate + 0.5 && ballz >= downTiles[i].zCoordinate - 0.5) {
+					if (downTiles[i].score == 1) {
+						downTouchRed = true;
+						score += 1;
+					}
+					if (downTiles[i].score == 2) {
+						downTouchBlue = true;
+						score += 2;
+					}
+					if (downTiles[i].score == 3) {
+						downTouchOrange = true;
+						score += 3;
+					}
+					if (downTiles[i].score == 4) {
+						downTouchGreen = true;
+						score -= 2;
+					}
+				}
+
+			}
+			glutTimerFunc(500, time, 0);
+			
 		}
-		if (bally >= 3) {										// hit top wall
+		else if (bally >= 3) {										// hit top wall
 			verticalWallCollisionU = true;
 			verticalWallCollisionD = false;
+			// detecting which tile the ball hit exactly in top wall to calculate score
+			for (int i = 0; i < sizeof(upTiles) / sizeof(upTiles[0]); i++) {
+				if (ballx <= upTiles[i].xCoordinate + 0.5 && ballx >= upTiles[i].xCoordinate - 0.5 && ballz <= upTiles[i].zCoordinate + 0.5 && ballz >= upTiles[i].zCoordinate - 0.5) {
+					if (upTiles[i].score == 1) {
+						upTouchRed = true;
+						score += 1;
+					}
+					if (upTiles[i].score == 2) {
+						upTouchBlue = true;
+						score += 2;
+					}
+					if (upTiles[i].score == 3) {
+						upTouchOrange = true;
+						score += 3;
+					}
+					if (upTiles[i].score == 4) {
+						upTouchGreen = true;
+						score -= 2;
+					}
+				}
+
+			}
+			glutTimerFunc(500, time, 0);
+
+
 		}
 
 
-		if (ballx >= 3) {										// hit right wall
+		else if (ballx >= 3) {										// hit right wall
 			sideWallCollisionR = true;
 			sideWallCollisionL = false;
+			// detecting which tile the ball hit exactly in right floor to calculate score
+			for (int i = 0; i < sizeof(rightTiles) / sizeof(rightTiles[0]); i++) {
+				if (bally <= rightTiles[i].yCoordinate + 0.5 && bally >= rightTiles[i].yCoordinate - 0.5 && ballz <= rightTiles[i].zCoordinate + 0.5 && ballz >= rightTiles[i].zCoordinate - 0.5) {
+					if (rightTiles[i].score == 1) {
+						rightTouchBlue = true;
+						score += 2;
+					}
+					if (rightTiles[i].score == 2) {
+						rightTouchRed = true;
+						score += 1;
+					}
+					if (rightTiles[i].score == 3) {
+						rightTouchGreen = true;
+						score -= 2;
+					}
+					if (rightTiles[i].score == 4) {
+						rightTouchOrange = true;
+						score += 3;
+					}
+				}
+
+			}
+			glutTimerFunc(500, time, 0);
+		
 		}
-		if (ballx <= -3) {										// hit left wall
+		else if (ballx <= -3) {										// hit left wall
 			sideWallCollisionR = false;
 			sideWallCollisionL = true;
+			// detecting which tile the ball hit exactly in left floor to calculate score
+			for (int i = 0; i < sizeof(leftTiles) / sizeof(leftTiles[0]); i++) {
+				
+				if (bally <= leftTiles[i].yCoordinate + 0.5 && bally >= leftTiles[i].yCoordinate - 0.5 && ballz <= leftTiles[i].zCoordinate + 0.5 && ballz >= leftTiles[i].zCoordinate - 0.5) {
+					if (leftTiles[i].score == 1) {
+						leftTouchBlue = true;
+						score += 2;
+					}
+					if (leftTiles[i].score == 2) {
+						leftTouchRed = true;
+						score += 1;
+					}
+					if (leftTiles[i].score == 3) {
+						leftTouchGreen = true;
+						score -=2;
+					}
+					if (leftTiles[i].score == 4) {
+						leftTouchOrange = true;
+						score += 3;
+					}
+					
+				}
+
+			}
+			glutTimerFunc(500, time, 0);
 		}
 
 		if (ballz <= -15.5) {									// stick to the end wall
-			
 			gameRounds -= 1;
 			reset();
 			round_finished = true;
-
 		}
 
 
@@ -582,7 +855,6 @@ void Anim() {
 				bally += directionY;
 			}
 		}
-
 		if (left == true) {
 			if (sideWallCollisionL == true) {
 				ballx -= directionX;
@@ -607,7 +879,6 @@ void Anim() {
 	glutPostRedisplay();
 }
 
-
 void setupLights() {
 	GLfloat ambient[] = { 0.7f, 0.7f, 0.7, 1.0f };
 	GLfloat diffuse[] = { 0.6f, 0.6f, 0.6, 1.0f };
@@ -622,7 +893,6 @@ void setupLights() {
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
 }
-
 
 void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -656,8 +926,17 @@ void Display(void) {
 
 
 
+
+	if (upTouchRed == true || downTouchRed == true || rightTouchRed == true || leftTouchRed == true) {
+		displayText(0, 0, 25, 1, 0, 0, "+1");
+	}
+
 	glFlush();
+
 }
+
+
+
 
 void main(int argc, char** argv) {
 	glutInit(&argc, argv);
@@ -672,7 +951,6 @@ void main(int argc, char** argv) {
 	glutKeyboardUpFunc(keyUp);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -693,6 +971,7 @@ void main(int argc, char** argv) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	//gluLookAt(0.0f, 0.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	glutTimerFunc(0, time, 0);
 
 	glutMainLoop();
 }
