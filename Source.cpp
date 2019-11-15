@@ -29,7 +29,8 @@ float camera = 35.0;
 
 bool stop_game = false;
 
-float rotAng;
+float rotAngX=0;
+float rotAngY=0;
 
 //values of ball projectile for translation
 float ballx = 0;
@@ -169,14 +170,14 @@ void key(unsigned char k, int x, int y)
 			up = true;
 			if (directionY < 0.008) {
 				directionY += 0.0001;
-				//arrowY = 1;
+				rotAngY += 0.5;
 			}
 		}
 		if (k == 's') {
 			down = true;
 			if (directionY < 0.008) {
 				directionY -= 0.0001;
-				//arrowY = 1;
+				rotAngY -= 0.5;
 			}
 		}
 
@@ -184,7 +185,7 @@ void key(unsigned char k, int x, int y)
 			right = true;
 			if (directionX < 0.008) {
 				directionX += 0.0001;
-				//arrowX = 1;
+				rotAngX -= 0.5;
 			}
 		}
 
@@ -192,7 +193,7 @@ void key(unsigned char k, int x, int y)
 			left = true;
 			if (directionX > -0.008) {
 				directionX -= 0.0001;
-				//arrowX = 1;
+				rotAngX += 0.5;
 			}
 		}
 		
@@ -217,6 +218,8 @@ void keyUp(unsigned char k, int x, int y)//keyboard up function is called whenev
 		if (k == 'x') {
 			throwBall = true;
 			disableKeyboard = true;
+			rotAngX = 0;
+			rotAngY = 0;
 		}
 
 		if (k == 'r' && round_finished == true) {
@@ -301,7 +304,7 @@ void drawWallRightAndLeft(double thickness, double x, double z, int random) {
 void drawWallEnd(double thickness, double x, double z) {
 	glPushMatrix();
 	glRotated(90, 1, 0, 0);
-	glColor3f(0.5, 0.5, 0.5);
+	glColor3f(1.0, 1.0, 1.0);
 	glTranslated(x, 0, z);
 	glScaled(1.0, thickness, 1.0);
 	glutSolidCube(1.0);
@@ -537,11 +540,12 @@ void drawRoom() {
 
 void drawArrow() {
 	glPushMatrix();
-	glColor3f(1.0, 0.0, 0.0);
-	//glRotatef(-rotAng, 1, 1, 0);
-	glScalef(0.2,0.2,1);
-	glTranslated(0, 0, 4);
-	glRotatef(-20,arrowX,arrowY,0);
+	glColor3f(0.0, 0.0, 1.0);
+	
+	glTranslatef(0,-0.5,30);
+	glRotatef(rotAngX, 0, 1, 0);
+	glRotatef(rotAngY, 1, 0, 0);
+	glScalef(0.2,0.2,4);
 	
 	glutSolidCube(0.5);
 	glPopMatrix();
@@ -720,18 +724,22 @@ void Anim() {
 					if (downTiles[i].score == 1) {
 						downTouchRed = true;
 						score += 1;
+						PlaySound("red.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (downTiles[i].score == 2) {
 						downTouchBlue = true;
 						score += 2;
+						PlaySound("blue.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (downTiles[i].score == 3) {
 						downTouchOrange = true;
 						score += 3;
+						PlaySound("orange.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (downTiles[i].score == 4) {
 						downTouchGreen = true;
 						score -= 2;
+						PlaySound("green.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 				}
 
@@ -748,18 +756,22 @@ void Anim() {
 					if (upTiles[i].score == 1) {
 						upTouchRed = true;
 						score += 1;
+						PlaySound("red.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (upTiles[i].score == 2) {
 						upTouchBlue = true;
 						score += 2;
+						PlaySound("blue.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (upTiles[i].score == 3) {
 						upTouchOrange = true;
 						score += 3;
+						PlaySound("orange.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (upTiles[i].score == 4) {
 						upTouchGreen = true;
 						score -= 2;
+						PlaySound("green.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 				}
 
@@ -779,18 +791,22 @@ void Anim() {
 					if (rightTiles[i].score == 1) {
 						rightTouchBlue = true;
 						score += 2;
+						PlaySound("blue.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (rightTiles[i].score == 2) {
 						rightTouchRed = true;
 						score += 1;
+						PlaySound("red.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (rightTiles[i].score == 3) {
 						rightTouchGreen = true;
 						score -= 2;
+						PlaySound("green.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (rightTiles[i].score == 4) {
 						rightTouchOrange = true;
 						score += 3;
+						PlaySound("orange.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 				}
 
@@ -808,18 +824,22 @@ void Anim() {
 					if (leftTiles[i].score == 1) {
 						leftTouchBlue = true;
 						score += 2;
+						PlaySound("blue.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (leftTiles[i].score == 2) {
 						leftTouchRed = true;
 						score += 1;
+						PlaySound("red.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (leftTiles[i].score == 3) {
 						leftTouchGreen = true;
 						score -=2;
+						PlaySound("green.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					if (leftTiles[i].score == 4) {
 						leftTouchOrange = true;
 						score += 3;
+						PlaySound("orange.wav", NULL, SND_ASYNC | SND_FILENAME);
 					}
 					
 				}
@@ -832,6 +852,7 @@ void Anim() {
 			gameRounds -= 1;
 			reset();
 			round_finished = true;
+			PlaySound("endwall.wav", NULL, SND_ASYNC | SND_FILENAME);
 		}
 
 
@@ -898,15 +919,12 @@ void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	
 	setupLights();
-
-
 	gluLookAt(0.0f, 0.0f, camera, 0.0f, 1.0f, 0.0f, cameraRot, 1.0f, 0.0f);
-
 	drawBall();
-	//drawArrow();
+	if (throwBall == false) {
+		drawArrow();
+	}
 	drawRoom();
 	char result[100];   // array to hold the result.
 
@@ -927,8 +945,18 @@ void Display(void) {
 
 
 
+
 	if (upTouchRed == true || downTouchRed == true || rightTouchRed == true || leftTouchRed == true) {
 		displayText(0, 0, 25, 1, 0, 0, "+1");
+	}
+	else if (upTouchBlue == true || downTouchBlue == true || rightTouchBlue == true || leftTouchBlue == true) {
+		displayText(0, 0, 25, 1, 0, 0, "+2");
+	}
+	else if (upTouchGreen == true || downTouchGreen == true || rightTouchGreen == true || leftTouchGreen == true) {
+		displayText(0, 0, 25, 1, 0, 0, "-2");
+	}
+	else if (upTouchOrange == true || downTouchOrange == true || rightTouchOrange == true || leftTouchOrange == true) {
+		displayText(0, 0, 25, 1, 0, 0, "+3");
 	}
 
 	glFlush();
